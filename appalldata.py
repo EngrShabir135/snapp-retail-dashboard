@@ -191,7 +191,7 @@ def run():
 
     region_order = [
         "National", "FSD", "GJW", "SKT", "ISB", "KHI", "HYD", "LHR", "MUL",
-        "BHP", "PSH", "SUK", "RYK"
+        "BWP", "PSH", "SUK", "RYK"
     ]
 
     # -----------------------
@@ -608,4 +608,5 @@ def run():
         )
     else:
         st.info("Please select at least one brand for both PEP and KO to see the CSD table.")
+
 
