@@ -1,5 +1,106 @@
 import streamlit as st
-import appalldata, appdkoboimages, appntppk, about, appreadbooks  # ✅ Added appbooks
+import pandas as pd
+import appalldata, appdkoboimages, appntppk, about, appreadbooks
+
+# -------------------------
+# NTP Analysis Function
+# -------------------------
+def run_ntp_analysis():
+    st.title("📊 NTP Analysis Dashboard")
+    
+    # --- Define fixed SKU lists per CAT ---
+    SKU_TEMPLATE = {
+        "COLA": [
+            "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
+            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+        ],
+        "LLM": [
+            "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
+            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+        ],
+        "ORANGE": [
+            "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
+            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+        ],
+        "CITRUS": [
+            "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
+            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+        ],
+        "ENERGY": [
+            "250ml Can", "300ml PET", "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+        ],
+        "WATER": [
+            "1.5Ltr PET", "500ML PET", "600ml PET"
+        ],
+        "JNSD": [
+            "1Ltr PET", "200ml TP", "350ml TP"
+        ]
+    }
+    
+    # --- File uploader ---
+    uploaded_file = st.file_uploader("Upload your dataset (Excel or CSV)", type=["xlsx", "xls", "csv"])
+    
+    if uploaded_file:
+        # Load dataset
+        if uploaded_file.name.endswith(".csv"):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+    
+        st.success("✅ File uploaded successfully!")
+    
+        # --- Sidebar filters ---
+        st.sidebar.header("🔎 Filters")
+    
+        channel = st.sidebar.selectbox("Select Channel", options=df["CHANNEL"].unique())
+        cat = st.sidebar.selectbox("Select Category", options=df["CAT"].unique())
+        region = st.sidebar.selectbox("Select Region", options=df["REGION"].unique())
+    
+        # --- Filter dataset ---
+        filtered = df[
+            (df["CHANNEL"] == channel) &
+            (df["CAT"] == cat) &
+            (df["REGION"] == region)
+        ]
+    
+        if filtered.empty:
+            st.warning("⚠️ No data available for this selection.")
+        else:
+            # --- Pivot table like screenshot ---
+            pivot = pd.pivot_table(
+                filtered,
+                index="SKUS",
+                columns="BRAND",
+                values="NTP/Case",
+                aggfunc="mean"
+            )
+    
+            # --- Reindex SKUs based on template ---
+            sku_list = SKU_TEMPLATE.get(cat, sorted(filtered["SKUS"].unique()))
+            pivot = pivot.reindex(sku_list)
+    
+            pivot = pivot.reset_index().rename(columns={"index": "SKU"})
+    
+            st.subheader(f"📌 NTP Table for {cat} in {region} - Channel: {channel}")
+            st.dataframe(pivot, use_container_width=True)
+    
+            # --- Download option ---
+            @st.cache_data
+            def convert_excel(df):
+                from io import BytesIO
+                output = BytesIO()
+                with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+                    df.to_excel(writer, index=False, sheet_name="NTP_Table")
+                return output.getvalue()
+    
+            excel_data = convert_excel(pivot)
+    
+            st.download_button(
+                label="📥 Download Table as Excel",
+                data=excel_data,
+                file_name=f"NTP_Table_{cat}_{region}_{channel}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
 # -------------------------
 # Page Config
@@ -68,9 +169,9 @@ def set_page(page):
 
 selected_page = st.session_state["selected_page"]
 
-# ✅ Updated Navbar - now has 6 buttons (added Read Books)
+# ✅ Updated Navbar - now has 7 buttons (added NTP Analysis)
 st.markdown('<div class="navbar">', unsafe_allow_html=True)
-cols = st.columns(6)
+cols = st.columns(7)
 
 with cols[0]:
     if st.button("🏠 Home", key="home_btn"):
@@ -91,18 +192,24 @@ with cols[2]:
         st.markdown('<style>#all_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
 
 with cols[3]:
+    if st.button("🔍 NTP Analysis", key="ntp_analysis_btn"):  # ✅ New Button
+        set_page("NTP Analysis")
+    if selected_page == "NTP Analysis":
+        st.markdown('<style>#ntp_analysis_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
+
+with cols[4]:
     if st.button("🖼️ KoBo Images", key="kobo_btn"):
         set_page("KoBo Images")
     if selected_page == "KoBo Images":
         st.markdown('<style>#kobo_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
 
-with cols[4]:
-    if st.button("📚 Read Books", key="books_btn"):  # ✅ New Button
+with cols[5]:
+    if st.button("📚 Read Books", key="books_btn"):
         set_page("Read Books")
     if selected_page == "Read Books":
         st.markdown('<style>#books_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
 
-with cols[5]:
+with cols[6]:
     if st.button("🤖 About Me", key="about_btn"):
         set_page("About Me")
     if selected_page == "About Me":
@@ -146,7 +253,7 @@ if selected_page == "Home":
     quotes = [
         "“Success is not final, failure is not fatal: It is the courage to continue that counts.” – Winston Churchill",
         "“The best way to get started is to quit talking and begin doing.” – Walt Disney",
-        "“Don’t let yesterday take up too much of today.” – Will Rogers",
+        "“Don't let yesterday take up too much of today.” – Will Rogers",
         "“It always seems impossible until it's done.” – Nelson Mandela",
     ]
     for q in quotes:
@@ -161,10 +268,13 @@ elif selected_page == "NTP PK":
 elif selected_page == "All Data":
     appalldata.run()
 
+elif selected_page == "NTP Analysis":  # ✅ New Section
+    run_ntp_analysis()
+
 elif selected_page == "KoBo Images":
     appdkoboimages.run()
 
-elif selected_page == "Read Books":  # ✅ New Section
+elif selected_page == "Read Books":
     appreadbooks.run()
 
 elif selected_page == "About Me":
