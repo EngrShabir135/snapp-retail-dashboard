@@ -12,25 +12,25 @@ def run_ntp_analysis():
     SKU_TEMPLATE = {
         "COLA": [
             "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
-            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+            "300-350 ML PET", "500ml PET", "SSRB"
         ],
         "LLM": [
             "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
-            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+            "300-350 ML PET", "500ml PET", "SSRB"
         ],
         "ORANGE": [
             "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
-            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+            "300-350 ML PET", "500ml PET", "SSRB"
         ],
         "CITRUS": [
             "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
-            "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+            "300-350 ML PET", "500ml PET", "SSRB"
         ],
         "ENERGY": [
-            "250ml Can", "300ml PET", "300ml/345ml/350ml PET", "500ML PET", "SSRB"
+            "250ml Can", "300ml PET", "300-350 ML PET", "500ml PET", "SSRB"
         ],
         "WATER": [
-            "1.5Ltr PET", "500ML PET", "600ml PET"
+            "1.5Ltr PET", "500ml PET", "600ml PET"
         ],
         "JNSD": [
             "1Ltr PET", "200ml TP", "350ml TP"
@@ -279,3 +279,4 @@ elif selected_page == "Read Books":
 
 elif selected_page == "About Me":
     about.main()
+
