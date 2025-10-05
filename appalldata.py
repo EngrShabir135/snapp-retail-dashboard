@@ -95,7 +95,7 @@ def run():
         },
     }
 
-    city_pairs = [("KHI", "HYD"), ("MUL", "BHP"), ("SUK", "RYK"), ("GJW", "SKT")]
+    city_pairs = [("KHI", "HYD"), ("MUL", "BWP"), ("SUK", "RYK"), ("GJW", "SKT")]
 
     alias_map = {
         "GJW": "GUJ",
@@ -608,5 +608,6 @@ def run():
         )
     else:
         st.info("Please select at least one brand for both PEP and KO to see the CSD table.")
+
 
 
