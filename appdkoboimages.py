@@ -30,6 +30,10 @@ import filetype
 def run():
     st.title("📊 Download images from KOBO")
     st.write("This app downloads images from KOBO for both GT and WS")
+    st.write("col must be this for both start	end	Auditor Name	City	Survey Date	Bill Date	Shop Name	PEPSI BILL PICTURE_URL	COKE BILL PICTURE_URL	Cola Next Bill Picture_URL	NESTLE BILL PICTURE_URL")
+    st.write("for WS regin col name change into city")
+    st.write('For WS the PPT dashbord img col is P1 for PEP,IK1 for KO, PO1 for colanext, On1 for Nestle, SJ1 for Gourmet')
+    st.write("For GT the PPT dashbord img col is T1 for PEP, WE1 for KO, AMP1 for colanext, AKE1 for Nestle,ASV1 for Gourmet')
 
     # ------- Helper functions -------
 
@@ -206,4 +210,5 @@ def run():
                     st.error(f"Error: {e}")
 
     else:
+
         st.info('Upload a file and enter your Kobo username & password to begin.')
