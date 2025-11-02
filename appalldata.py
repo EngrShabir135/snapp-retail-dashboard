@@ -7,9 +7,11 @@ from io import BytesIO
 import re
 
 
+
 def run():
     
     st.title("📊 Take all data WS and GT")
+    st.write("covert sku into upper case")
 
     # -----------------------
     # Page / theme
@@ -32,66 +34,66 @@ def run():
         "LHE": {
             "300-350ML PET": {"PEPSI": 700, "COKE": 691},
             "500ML PET": {"PEPSI": 1022, "COKE": 869},
-            "1Ltr PET": {"PEPSI": 741, "COKE": 823},
-            "1.5Ltr PET": {"PEPSI": 856, "COKE": 822},
-            "2Ltr PET": {"PEPSI": 938, "COKE": 999},
-            "2.25Ltr PET": {"PEPSI": 1191, "COKE": 950},
+            "1LTR PET": {"PEPSI": 741, "COKE": 823},
+            "1.5LTR PET": {"PEPSI": 856, "COKE": 822},
+            "2LTR PET": {"PEPSI": 938, "COKE": 999},
+            "2.25LTR PET": {"PEPSI": 1191, "COKE": 950},
         },
         "ISB": {
             "300-350ML PET": {"PEPSI": 680, "COKE": 680},
             "500ML PET": {"PEPSI": 1054, "COKE": 1050},
-            "1Ltr PET": {"PEPSI": 810, "COKE": 835},
-            "1.5Ltr PET": {"PEPSI": 838, "COKE": 874},
-            "2Ltr PET": {"PEPSI": 0, "COKE": 999},
-            "2.25Ltr PET": {"PEPSI": 1185, "COKE": 0},
+            "1LTR PET": {"PEPSI": 810, "COKE": 835},
+            "1.5LTR PET": {"PEPSI": 838, "COKE": 874},
+            "2LTR PET": {"PEPSI": 0, "COKE": 999},
+            "2.25LTR PET": {"PEPSI": 1185, "COKE": 0},
         },
         "PSH": {
             "300-350ML PET": {"PEPSI": 690, "COKE": 680},
             "500ML PET": {"PEPSI": 1173, "COKE": 1173},
-            "1Ltr PET": {"PEPSI": 785, "COKE": 851},
-            "1.5Ltr PET": {"PEPSI": 877, "COKE": 940},
-            "2Ltr PET": {"PEPSI": 0, "COKE": 940},
-            "2.25Ltr PET": {"PEPSI": 1245, "COKE": 0},
+            "1LTR PET": {"PEPSI": 785, "COKE": 851},
+            "1.5LTR PET": {"PEPSI": 877, "COKE": 940},
+            "2LTR PET": {"PEPSI": 0, "COKE": 940},
+            "2.25LTR PET": {"PEPSI": 1245, "COKE": 0},
         },
         "FSD": {
             "300-350ML PET": {"PEPSI": 735, "COKE": 680},
             "500ML PET": {"PEPSI": 1050, "COKE": 1050},
-            "1Ltr PET": {"PEPSI": 750, "COKE": 800},
-            "1.5Ltr PET": {"PEPSI": 830, "COKE": 865},
-            "2Ltr PET": {"PEPSI": 0, "COKE": 999},
-            "2.25Ltr PET": {"PEPSI": 1187, "COKE": 0},
+            "1LTR PET": {"PEPSI": 750, "COKE": 800},
+            "1.5LTR PET": {"PEPSI": 830, "COKE": 865},
+            "2LTR PET": {"PEPSI": 0, "COKE": 999},
+            "2.25LTR PET": {"PEPSI": 1187, "COKE": 0},
         },
         "GUJ": {
             "300-350ML PET": {"PEPSI": 717, "COKE": 691},
             "500ML PET": {"PEPSI": 1052, "COKE": 1052},
-            "1Ltr PET": {"PEPSI": 780, "COKE": 828},
-            "1.5Ltr PET": {"PEPSI": 840, "COKE": 873},
-            "2Ltr PET": {"PEPSI": 938, "COKE": 1035},
-            "2.25Ltr PET": {"PEPSI": 0, "COKE": 0},
+            "1LTR PET": {"PEPSI": 780, "COKE": 828},
+            "1.5LTR PET": {"PEPSI": 840, "COKE": 873},
+            "2LTR PET": {"PEPSI": 938, "COKE": 1035},
+            "2.25LTR PET": {"PEPSI": 0, "COKE": 0},
         },
         "MUL": {
             "300-350ML PET": {"PEPSI": 720, "COKE": 713},
             "500ML PET": {"PEPSI": 1050, "COKE": 1050},
-            "1Ltr PET": {"PEPSI": 780, "COKE": 828},
-            "1.5Ltr PET": {"PEPSI": 860, "COKE": 840},
-            "2Ltr PET": {"PEPSI": 1125, "COKE": 1028},
-            "2.25Ltr PET": {"PEPSI": 0, "COKE": 0},
+            "1LTR PET": {"PEPSI": 780, "COKE": 828},
+            "1.5LTR PET": {"PEPSI": 860, "COKE": 840},
+            "2LTR PET": {"PEPSI": 1125, "COKE": 1028},
+            "2.25LTR PET": {"PEPSI": 0, "COKE": 0},
         },
         "KHI": {
             "300-350ML PET": {"PEPSI": 782, "COKE": 713},
             "500ML PET": {"PEPSI": 1087, "COKE": 1087},
-            "1Ltr PET": {"PEPSI": 782, "COKE": 845},
-            "1.5Ltr PET": {"PEPSI": 1079, "COKE": 873},
-            "2Ltr PET": {"PEPSI": 1071, "COKE": 1196},
-            "2.25Ltr PET": {"PEPSI": 1304, "COKE": 1152},
+            "1LTR PET": {"PEPSI": 782, "COKE": 845},
+            "1.5LTR PET": {"PEPSI": 1079, "COKE": 873},
+            "2LTR PET": {"PEPSI": 1071, "COKE": 1196},
+            "2.25LTR PET": {"PEPSI": 1304, "COKE": 1152},
         },
         "SUK": {
             "300-350ML PET": {"PEPSI": 715, "COKE": 680},
             "500ML PET": {"PEPSI": 1050, "COKE": 1050},
-            "1Ltr PET": {"PEPSI": 800, "COKE": 847},
-            "1.5Ltr PET": {"PEPSI": 889, "COKE": 865},
-            "2Ltr PET": {"PEPSI": 1017, "COKE": 1017},
-            "2.25Ltr PET": {"PEPSI": 1250, "COKE": 0},
+            "1LTR PET": {"PEPSI": 800, "COKE": 847},
+            "1.5LTR PET": {"PEPSI": 889, "COKE": 865},
+            "2LTR PET": {"PEPSI": 1017, "COKE": 1017},
+            "2.25LTR PET": {"PEPSI": 1250, "COKE": 0},
         },
     }
 
@@ -108,20 +110,20 @@ def run():
     skus_required = [
         "SSRB",
         "300-350 ML PET",
-        "500ml PET",
-        "1Ltr PET",
-        "1.5Ltr PET",
-        "2Ltr PET",
-        "2.25Ltr PET"
+        "500ML PET",
+        "1LTR PET",
+        "1.5LTR PET",
+        "2LTR PET",
+        "2.25LTR PET"
     ]
 
     pet_skus_to_fill = [
         "300-350 ML PET",
-        "500ml PET",
-        "1Ltr PET",
-        "1.5Ltr PET",
-        "2Ltr PET",
-        "2.25Ltr PET"
+        "500ML PET",
+        "1LTR PET",
+        "1.5LTR PET",
+        "2LTR PET",
+        "2.25LTR PET"
     ]
 
     def normalize_text(s):
@@ -608,6 +610,3 @@ def run():
         )
     else:
         st.info("Please select at least one brand for both PEP and KO to see the CSD table.")
-
-
-
