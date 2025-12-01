@@ -103,6 +103,129 @@ def run_ntp_analysis():
             )
 
 # -------------------------
+# Brand Comparison Portal Function
+# -------------------------
+def run_brand_comparison():
+    import numpy as np
+    import io
+    
+    st.title("📊 Brand vs Competitor Analysis")
+    
+    # --- File uploader ---
+    uploaded_file = st.file_uploader("Upload Dataset (Excel/CSV)", type=["xlsx", "csv"])
+    
+    if uploaded_file:
+        if uploaded_file.name.endswith(".csv"):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+
+        st.success("✅ File uploaded successfully!")
+
+        # --- Region filter ---
+        region_list = df["REGION"].dropna().unique().tolist()
+        selected_region = st.selectbox("Select Region", region_list)
+        df_region = df[df["REGION"] == selected_region]
+
+        # --- Category filter ---
+        category_list = df_region["CATEGORY"].dropna().unique().tolist()
+        selected_category = st.selectbox("Select Category", category_list)
+        df_cat = df_region[df_region["CATEGORY"] == selected_category]
+
+        # --- Brand filter ---
+        brand_list = df_cat["Brand"].dropna().unique().tolist()
+        selected_brands = st.multiselect("Select Brands for Comparison", brand_list)
+
+        # --- Metric selection ---
+        st.info("📊 Using 'Average of NTP' as the metric")
+        metric_column = "Average of NTP"
+
+        # --- SKU list logic ---
+        energy_brands = ["Sting", "Roar", "RedBull", "Storm"]
+        juice_brands = ["Slice", "Nesfruta", "Cappy"]
+        water_brands = ["Aquafina", "Cola Next Water", "Dasani", "Gourmet Water", "Nestle", "Sparklett"]
+
+        if any(b in selected_brands for b in energy_brands):
+            sku_list = ["250ml Can", "300ml PET", "300ml/345ml/350ml PET", "500ml PET", "SSRB"]
+        elif any(b in selected_brands for b in juice_brands):
+            sku_list = ["1Ltr PET", "200ml TP", "350ml TP"]
+        elif any(b in selected_brands for b in water_brands):
+            sku_list = ["1.5Ltr PET", "500ml PET", "600ml PET"]
+        else:
+            sku_list = [
+                "1.5Ltr PET", "1Ltr PET", "2.25Ltr PET", "250ml Can", "2Ltr PET",
+                "300ml/345ml/350ml PET", "500ml PET", "SSRB"
+            ]
+
+        # --- Calculations ---
+        if selected_brands:
+            result = pd.DataFrame(index=sku_list)
+
+            for brand in selected_brands:
+                brand_df = df_cat[df_cat["Brand"] == brand]
+                brand_values = []
+                
+                for sku in sku_list:
+                    sku_data = brand_df[brand_df["SKUS"] == sku][metric_column]
+                    
+                    if len(sku_data) > 0:
+                        value = sku_data.mean()
+                    else:
+                        value = np.nan
+                    
+                    brand_values.append(value)
+                
+                result[brand] = brand_values
+
+            # --- Show table ---
+            st.subheader(f"📌 Average NTP by SKU & Brand in {selected_region} ({selected_category})")
+            
+            # Display table with blank cells for missing values
+            display_df = result.replace(np.nan, "")
+            st.dataframe(display_df)
+
+            # --- Download button for clean Excel ---
+            st.markdown("---")
+            
+            # Prepare data for download (blank cells for missing values)
+            download_df = result.replace(np.nan, "")
+            
+            # Create Excel file with clean formatting
+            excel_buffer = io.BytesIO()
+            with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+                download_df.to_excel(writer, sheet_name='Average_NTP', index=True)
+                
+                # Get workbook and worksheet objects
+                workbook = writer.book
+                worksheet = writer.sheets['Average_NTP']
+                
+                # Add formatting
+                header_format = workbook.add_format({
+                    'bold': True,
+                    'text_wrap': True,
+                    'valign': 'top',
+                    'fg_color': '#D7E4BC',
+                    'border': 1
+                })
+                
+                # Write header
+                for col_num, value in enumerate(download_df.columns.values):
+                    worksheet.write(0, col_num + 1, value, header_format)
+                
+                # Write index header
+                worksheet.write(0, 0, "SKU", header_format)
+
+            excel_data = excel_buffer.getvalue()
+            
+            # Download button
+            st.download_button(
+                label="⬇️ Download Average NTP Table as Excel",
+                data=excel_data,
+                file_name=f"Average_NTP_by_SKU_Brand_{selected_region}_{selected_category}.xlsx",
+                mime="application/vnd.ms-excel"
+            )
+
+# -------------------------
 # Page Config
 # -------------------------
 st.set_page_config(page_title="Snapp Retail Dashboard", layout="wide")
@@ -137,14 +260,16 @@ st.markdown("""
         box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
     }
     .nav-button {
-        padding: 10px 25px;
+        padding: 10px 20px;
         color: black !important;
         font-weight: bold;
         border-radius: 8px;
-        margin: 6px 10px;
+        margin: 6px 8px;
         cursor: pointer;
         transition: 0.3s;
         border: none;
+        font-size: 14px;
+        white-space: nowrap;
     }
     .nav-button:hover {
         background-color: white;
@@ -154,6 +279,17 @@ st.markdown("""
     .active {
         background-color: white !important;
         color: black !important;
+    }
+    
+    /* Quotes styling */
+    .quote-card {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 20px;
+        border-radius: 15px;
+        margin: 10px 0;
+        text-align: center;
+        font-style: italic;
+        font-size: 18px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -169,9 +305,9 @@ def set_page(page):
 
 selected_page = st.session_state["selected_page"]
 
-# ✅ Updated Navbar - now has 7 buttons (added NTP Analysis)
+# ✅ Updated Navbar - now has 8 buttons (added Brand Comparison)
 st.markdown('<div class="navbar">', unsafe_allow_html=True)
-cols = st.columns(7)
+cols = st.columns(8)
 
 with cols[0]:
     if st.button("🏠 Home", key="home_btn"):
@@ -192,24 +328,30 @@ with cols[2]:
         st.markdown('<style>#all_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
 
 with cols[3]:
-    if st.button("🔍 NTP Analysis", key="ntp_analysis_btn"):  # ✅ New Button
+    if st.button("🔍 NTP Analysis", key="ntp_analysis_btn"):
         set_page("NTP Analysis")
     if selected_page == "NTP Analysis":
         st.markdown('<style>#ntp_analysis_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
 
 with cols[4]:
+    if st.button("🆚 Brand Compare", key="brand_compare_btn"):  # ✅ New Brand Comparison Button
+        set_page("Brand Compare")
+    if selected_page == "Brand Compare":
+        st.markdown('<style>#brand_compare_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
+
+with cols[5]:
     if st.button("🖼️ KoBo Images", key="kobo_btn"):
         set_page("KoBo Images")
     if selected_page == "KoBo Images":
         st.markdown('<style>#kobo_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
 
-with cols[5]:
+with cols[6]:
     if st.button("📚 Read Books", key="books_btn"):
         set_page("Read Books")
     if selected_page == "Read Books":
         st.markdown('<style>#books_btn{background:white !important;color:black !important;}</style>', unsafe_allow_html=True)
 
-with cols[6]:
+with cols[7]:
     if st.button("🤖 About Me", key="about_btn"):
         set_page("About Me")
     if selected_page == "About Me":
@@ -268,8 +410,11 @@ elif selected_page == "NTP PK":
 elif selected_page == "All Data":
     appalldata.run()
 
-elif selected_page == "NTP Analysis":  # ✅ New Section
+elif selected_page == "NTP Analysis":
     run_ntp_analysis()
+
+elif selected_page == "Brand Compare":  # ✅ New Brand Comparison Page
+    run_brand_comparison()
 
 elif selected_page == "KoBo Images":
     appdkoboimages.run()
@@ -279,4 +424,3 @@ elif selected_page == "Read Books":
 
 elif selected_page == "About Me":
     about.main()
-
