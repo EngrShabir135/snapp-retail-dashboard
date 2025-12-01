@@ -116,7 +116,7 @@ def run_ntp_analysis():
             pivot = pivot.reset_index().rename(columns={"index": "SKU"})
 
             st.subheader(f"📌 NTP Table for {cat} in {region} - Channel: {channel}")
-            st.dataframe(pivot, use_container_width=True)
+            st.dataframe(pivot, width='stretch')
 
             # --- Download option ---
             @st.cache_data
@@ -252,7 +252,7 @@ def run_brand_comparison():
             
             # Display table with blank cells for missing values
             display_df = result.replace(np.nan, "")
-            st.dataframe(display_df)
+            st.dataframe(display_df, width='stretch')
 
             # --- Download button for clean Excel ---
             st.markdown("---")
@@ -438,7 +438,7 @@ try:
         with col2:
             # Use a placeholder or remove if logo.png doesn't exist
             try:
-                st.image("logo.png", use_container_width=True)
+                st.image("logo.png", width='stretch')
             except:
                 st.info("📷 Logo image not found. You can add logo.png to your project folder.")
 
